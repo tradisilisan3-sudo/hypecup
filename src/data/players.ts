@@ -3,9 +3,13 @@ import type { Player } from '@/types';
 export const players: Player[] = [
   // ── Group A ─────────────────────────────────────────────────
   // Mexico (id: 1)
-  { id: 1, name: 'Guillermo Ochoa', teamId: 1, position: 'GK', shirtNumber: 13 },
-  { id: 2, name: 'Edson Álvarez', teamId: 1, position: 'MF', shirtNumber: 4 },
-  { id: 3, name: 'Hirving Lozano', teamId: 1, position: 'FW', shirtNumber: 22 },
+  { id: 1,   name: 'Guillermo Ochoa',    teamId: 1, position: 'GK', shirtNumber: 13 },
+  { id: 2,   name: 'Edson Álvarez',      teamId: 1, position: 'MF', shirtNumber: 4  },
+  { id: 3,   name: 'Hirving Lozano',     teamId: 1, position: 'FW', shirtNumber: 22 },
+  { id: 122, name: 'Raúl Jiménez',       teamId: 1, position: 'FW', shirtNumber: 9  },
+  { id: 123, name: 'Julián Quiñones',    teamId: 1, position: 'FW', shirtNumber: 23 },
+  { id: 124, name: 'Roberto Alvarado',   teamId: 1, position: 'MF', shirtNumber: 18 },
+  { id: 125, name: 'Cesar Montes',       teamId: 1, position: 'DF', shirtNumber: 3  },
 
   // South Africa (id: 2)
   { id: 4, name: 'Percy Tau', teamId: 2, position: 'FW', shirtNumber: 11 },

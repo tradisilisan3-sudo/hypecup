@@ -251,27 +251,88 @@ export const mockPredictions: Prediction[] = [
 // Mock Standings (initial — all zeros, tournament hasn't started)
 // ---------------------------------------------------------------------------
 
-export const mockStandings: Standing[] = teams.map((team, index) => ({
-  teamId: team.id,
-  group: team.group,
-  played: 0,
-  won: 0,
-  drawn: 0,
-  lost: 0,
-  goalsFor: 0,
-  goalsAgainst: 0,
-  goalDifference: 0,
-  points: 0,
-  position: (index % 4) + 1, // 1-4 within each group
-}));
+// Mexico: W1 D0 L0 GF2 GA0 GD+2 Pts3
+// South Africa: W0 D0 L1 GF0 GA2 GD-2 Pts0
+// All other teams: 0 played (tournament just started)
+export const mockStandings: Standing[] = [
+  // Group A — Mexico vs South Africa played (2-0)
+  { teamId: 1,  group: 'A', played: 1, won: 1, drawn: 0, lost: 0, goalsFor: 2, goalsAgainst: 0, goalDifference: 2,  points: 3, position: 1 }, // Mexico
+  { teamId: 3,  group: 'A', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0,  points: 0, position: 2 }, // Korea Republic
+  { teamId: 4,  group: 'A', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0,  points: 0, position: 3 }, // Czechia
+  { teamId: 2,  group: 'A', played: 1, won: 0, drawn: 0, lost: 1, goalsFor: 0, goalsAgainst: 2, goalDifference: -2, points: 0, position: 4 }, // South Africa
+  // Group B
+  { teamId: 5,  group: 'B', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 1 }, // Canada
+  { teamId: 6,  group: 'B', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 2 }, // Bosnia
+  { teamId: 7,  group: 'B', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 3 }, // Qatar
+  { teamId: 8,  group: 'B', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 4 }, // Switzerland
+  // Group C
+  { teamId: 9,  group: 'C', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 1 }, // Brazil
+  { teamId: 10, group: 'C', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 2 }, // Morocco
+  { teamId: 11, group: 'C', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 3 }, // Haiti
+  { teamId: 12, group: 'C', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 4 }, // Scotland
+  // Group D
+  { teamId: 13, group: 'D', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 1 }, // USA
+  { teamId: 14, group: 'D', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 2 }, // Paraguay
+  { teamId: 15, group: 'D', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 3 }, // Australia
+  { teamId: 16, group: 'D', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 4 }, // Türkiye
+  // Group E
+  { teamId: 17, group: 'E', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 1 }, // Germany
+  { teamId: 18, group: 'E', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 2 }, // Curaçao
+  { teamId: 19, group: 'E', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 3 }, // Côte d'Ivoire
+  { teamId: 20, group: 'E', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 4 }, // Ecuador
+  // Group F
+  { teamId: 21, group: 'F', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 1 }, // Netherlands
+  { teamId: 22, group: 'F', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 2 }, // Japan
+  { teamId: 23, group: 'F', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 3 }, // Sweden
+  { teamId: 24, group: 'F', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 4 }, // Tunisia
+  // Group G
+  { teamId: 25, group: 'G', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 1 }, // Belgium
+  { teamId: 26, group: 'G', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 2 }, // Egypt
+  { teamId: 27, group: 'G', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 3 }, // IR Iran
+  { teamId: 28, group: 'G', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 4 }, // New Zealand
+  // Group H
+  { teamId: 29, group: 'H', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 1 }, // Spain
+  { teamId: 30, group: 'H', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 2 }, // Cabo Verde
+  { teamId: 31, group: 'H', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 3 }, // Saudi Arabia
+  { teamId: 32, group: 'H', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 4 }, // Uruguay
+  // Group I
+  { teamId: 33, group: 'I', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 1 }, // France
+  { teamId: 34, group: 'I', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 2 }, // Senegal
+  { teamId: 35, group: 'I', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 3 }, // Iraq
+  { teamId: 36, group: 'I', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 4 }, // Norway
+  // Group J
+  { teamId: 37, group: 'J', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 1 }, // Argentina
+  { teamId: 38, group: 'J', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 2 }, // Algeria
+  { teamId: 39, group: 'J', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 3 }, // Austria
+  { teamId: 40, group: 'J', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 4 }, // Jordan
+  // Group K
+  { teamId: 41, group: 'K', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 1 }, // Portugal
+  { teamId: 42, group: 'K', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 2 }, // DR Congo
+  { teamId: 43, group: 'K', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 3 }, // Uzbekistan
+  { teamId: 44, group: 'K', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 4 }, // Colombia
+  // Group L
+  { teamId: 45, group: 'L', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 1 }, // England
+  { teamId: 46, group: 'L', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 2 }, // Croatia
+  { teamId: 47, group: 'L', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 3 }, // Ghana
+  { teamId: 48, group: 'L', played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0, position: 4 }, // Panama
+];
 
 // ---------------------------------------------------------------------------
-// Mock Top Scorers & Assists (empty — tournament hasn't started)
+// Mock Top Scorers — updated from finished matches
 // ---------------------------------------------------------------------------
+// Mexico 2–0 South Africa (Jun 11): Quiñones 9', Jiménez 67'
+export const mockTopScorers: TopScorer[] = [
+  { playerId: 123, goals: 1, assists: 1, matchesPlayed: 1 }, // Julián Quiñones (goal + assist on 2nd)
+  { playerId: 122, goals: 1, assists: 0, matchesPlayed: 1 }, // Raúl Jiménez
+];
 
-export const mockTopScorers: TopScorer[] = [];
-
-export const mockTopAssists: TopAssist[] = [];
+// ---------------------------------------------------------------------------
+// Mock Top Assists — updated from finished matches
+// ---------------------------------------------------------------------------
+export const mockTopAssists: TopAssist[] = [
+  { playerId: 123, assists: 1, matchesPlayed: 1 }, // Julián Quiñones (assisted 2nd goal)
+  { playerId: 124, assists: 1, matchesPlayed: 1 }, // Roberto Alvarado (assist on header)
+];
 
 // ---------------------------------------------------------------------------
 // Mock Notifications
