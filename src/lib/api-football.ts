@@ -1,61 +1,28 @@
 /**
  * API-Football client for HypeCup
- * Provider: api-sports.io (v3.football.api-sports.io)
- * Plan: Free (100 req/day)
+ * All requests go through internal Next.js API routes (/api/football/*)
+ * to avoid CORS and keep the API key server-side only.
+ *
  * Docs: https://www.api-football.com/documentation-v3
  */
 
-const API_KEY  = process.env.NEXT_PUBLIC_API_FOOTBALL_KEY!;
-const BASE_URL = 'https://v3.football.api-sports.io';
-const LEAGUE   = Number(process.env.NEXT_PUBLIC_WC_LEAGUE_ID  ?? 1);
-const SEASON   = Number(process.env.NEXT_PUBLIC_WC_SEASON     ?? 2026);
-
 // ---------------------------------------------------------------------------
-// Low-level fetch helper
-// ---------------------------------------------------------------------------
-async function apiFetch<T>(endpoint: string): Promise<T | null> {
-  try {
-    const res = await fetch(`${BASE_URL}${endpoint}`, {
-      headers: {
-        'x-apisports-key': API_KEY,
-      },
-      // Cache for 5 minutes — reduces daily quota burn
-      next: { revalidate: 300 },
-    });
-
-    if (!res.ok) {
-      console.error(`[API-Football] ${endpoint} → HTTP ${res.status}`);
-      return null;
-    }
-
-    const json = await res.json();
-
-    // API-Football wraps results in { response: [...] }
-    if (json.errors && Object.keys(json.errors).length > 0) {
-      console.error('[API-Football] API error:', json.errors);
-      return null;
-    }
-
-    return json.response as T;
-  } catch (err) {
-    console.error(`[API-Football] fetch failed for ${endpoint}:`, err);
-    return null;
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Types (slim — only what we need)
+// Types
 // ---------------------------------------------------------------------------
 export interface ApiFixture {
   fixture: {
     id:     number;
-    date:   string;   // ISO 8601 UTC
-    status: { short: string; elapsed: number | null };
+    date:   string; // ISO 8601 UTC
+    status: { short: string; elapsed: number | null; long: string };
   };
-  league: { round: string };
+  league: {
+    id:    number;
+    name:  string;
+    round: string;
+  };
   teams: {
-    home: { id: number; name: string; logo: string };
-    away: { id: number; name: string; logo: string };
+    home: { id: number; name: string; logo: string; winner: boolean | null };
+    away: { id: number; name: string; logo: string; winner: boolean | null };
   };
   goals: { home: number | null; away: number | null };
   score: {
@@ -72,6 +39,7 @@ export interface ApiStanding {
   points:        number;
   goalsDiff:     number;
   group:         string;
+  form:          string;
   all: {
     played: number;
     win:    number;
@@ -82,7 +50,11 @@ export interface ApiStanding {
 }
 
 export interface ApiTopScorer {
-  player: { id: number; name: string; photo: string };
+  player: {
+    id:    number;
+    name:  string;
+    photo: string;
+  };
   statistics: Array<{
     team:  { id: number; name: string; logo: string };
     goals: { total: number | null; assists: number | null };
@@ -91,61 +63,69 @@ export interface ApiTopScorer {
 }
 
 // ---------------------------------------------------------------------------
-// Public API functions
+// Internal helpers — calls our own Next.js API routes (no CORS issue)
+// ---------------------------------------------------------------------------
+async function internalFetch<T>(path: string): Promise<T | null> {
+  try {
+    const res = await fetch(path, {
+      // No-store on client side so we always get fresh data
+      cache: 'no-store',
+    });
+    if (!res.ok) {
+      console.error(`[HypeCup API] ${path} → HTTP ${res.status}`);
+      return null;
+    }
+    const json = await res.json();
+    if (json.error) {
+      console.error('[HypeCup API] Server error:', json.error);
+      return null;
+    }
+    return (json.response ?? json) as T;
+  } catch (err) {
+    console.error(`[HypeCup API] fetch failed for ${path}:`, err);
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Public API functions — called from client-side hooks
 // ---------------------------------------------------------------------------
 
-/**
- * All World Cup 2026 fixtures (group stage + knockout).
- * Cached 5 min — call this from a client-side hook with SWR-style refresh.
- */
+/** All World Cup 2026 group stage fixtures */
 export async function fetchFixtures(): Promise<ApiFixture[] | null> {
-  return apiFetch<ApiFixture[]>(
-    `/fixtures?league=${LEAGUE}&season=${SEASON}`
+  return internalFetch<ApiFixture[]>(
+    '/api/football/fixtures?from=2026-06-11&to=2026-06-30&league=1&season=2026'
   );
 }
 
-/**
- * Currently live World Cup fixtures.
- */
+/** Currently live World Cup fixtures */
 export async function fetchLiveFixtures(): Promise<ApiFixture[] | null> {
-  return apiFetch<ApiFixture[]>(
-    `/fixtures?live=all&league=${LEAGUE}`
-  );
+  return internalFetch<ApiFixture[]>('/api/football/fixtures?live=all&league=1');
 }
 
-/**
- * Group standings for all 12 groups.
- */
+/** Group standings for all 12 groups */
 export async function fetchStandings(): Promise<ApiStanding[][] | null> {
-  const data = await apiFetch<Array<{ league: { standings: ApiStanding[][] } }>>(
-    `/standings?league=${LEAGUE}&season=${SEASON}`
+  const data = await internalFetch<Array<{ league: { standings: ApiStanding[][] } }>>(
+    '/api/football/standings'
   );
   return data?.[0]?.league?.standings ?? null;
 }
 
-/**
- * Top scorers list (up to 20 players).
- */
+/** Top scorers */
 export async function fetchTopScorers(): Promise<ApiTopScorer[] | null> {
-  return apiFetch<ApiTopScorer[]>(
-    `/players/topscorers?league=${LEAGUE}&season=${SEASON}`
-  );
+  return internalFetch<ApiTopScorer[]>('/api/football/stats?type=scorers');
 }
 
-/**
- * Top assist providers list (up to 20 players).
- */
+/** Top assist providers */
 export async function fetchTopAssists(): Promise<ApiTopScorer[] | null> {
-  return apiFetch<ApiTopScorer[]>(
-    `/players/topassists?league=${LEAGUE}&season=${SEASON}`
-  );
+  return internalFetch<ApiTopScorer[]>('/api/football/stats?type=assists');
 }
 
 // ---------------------------------------------------------------------------
-// Status helpers
+// Status mapper
 // ---------------------------------------------------------------------------
 
-/** Map API status codes to our internal MatchStatus */
+/** Map API status short codes → our internal MatchStatus */
 export function mapApiStatus(short: string): 'upcoming' | 'live' | 'finished' {
   if (['1H', '2H', 'HT', 'ET', 'BT', 'P', 'LIVE'].includes(short)) return 'live';
   if (['FT', 'AET', 'PEN'].includes(short)) return 'finished';
